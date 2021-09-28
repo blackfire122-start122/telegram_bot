@@ -5,6 +5,26 @@ from aiogram.utils import executor
 from config import TOKEN
 import markup as nav
 
+import mysql.connector
+
+db = mysql.connector.connect(
+	host = "localhost",
+	user = "root",
+	passwd = "tytpassword",
+	port="3306",
+	database="shop_list",
+)
+
+cursor = db.cursor()
+# cursor.execute("CREATE DATABASE shop_list")
+# cursor.execute("CREATE TABLE users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), user_id INT UNIQUE)")
+
+
+# sql = "FROM users SELECT "
+# cursor.execute(sql)
+# db.commit()
+# print(cursor.rowcount)
+
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
@@ -43,6 +63,12 @@ async def echo_message(msg: types.Message):
 	global name_shop,type_shop
 	if name_to_ask and not name:
 		name = msg.text
+
+		sql = "INSERT INTO users (username,user_id) VALUES('" + name + "', " + str(msg.from_user.id) + ")"
+		cursor.execute(sql)
+		db.commit()
+		await bot.send_message(msg.from_user.id,'реєстрація пройшла успішно')
+
 		print("new user",name)
 
 	elif msg.text == "add shop":
